@@ -1,0 +1,15 @@
+dfmdslfm
+dsf
+sdf
+csdc
+cc=c=d
+Create integer score.
+Create integer lives.
+Set score to 0.
+Set lives to 3.
+Print score.
+Print lives.
+
+Create integer damage.
+Set damage to 10.
+Repeat 5 times: Print damage.

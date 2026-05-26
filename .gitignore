@@ -1,0 +1,9 @@
+# Node dependencies
+node_modules/
+
+# Compiled C++ executables
+*.exe
+backend/compiler_test.exe
+
+# Generated Output files
+backend/IO/output.cpp

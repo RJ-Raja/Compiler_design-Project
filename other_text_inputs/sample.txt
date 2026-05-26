@@ -1,0 +1,23 @@
+Create integer playerHealth.
+Create integer enemyAttack.
+Set playerHealth to 100.
+Set enemyAttack to 15.
+Print playerHealth.
+If playerHealth is greater than 50 then Print enemyAttack.
+Repeat 3 times: Print enemyAttack.
+
+
+Create integer speed.
+Set speed to 80.
+If speed is greater than 60 then Print speed.
+
+Create integer score.
+Create integer lives.
+Set score to 0.
+Set lives to 3.
+Print score.
+Print lives.
+
+Create integer damage.
+Set damage to 10.
+Repeat 5 times: Print damage.

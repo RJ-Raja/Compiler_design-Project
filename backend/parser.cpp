@@ -32,7 +32,6 @@ std::unique_ptr<ProgramNode> Parser::parseProgram() {
 
 std::unique_ptr<ASTNode> Parser::parseStatement() {
     Token token = currentToken();
-
     // Look at the first word to decide what kind of sentence this is
     if (token.type == TOKEN_CREATE) {
         return parseVariableDeclaration();
@@ -40,6 +39,10 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
         return parseAssignment();
     } else if (token.type == TOKEN_PRINT) {
         return parsePrint();
+    } else if (token.type == TOKEN_IF) {          
+        return parseIfStatement();
+    } else if (token.type == TOKEN_REPEAT) {      
+        return parseRepeatStatement();
     } else {
         throw std::runtime_error("Syntax Error: Unknown command starting with '" + token.value + "'");
     }
@@ -90,6 +93,48 @@ std::unique_ptr<ASTNode> Parser::parsePrint() {
     expect(TOKEN_IDENTIFIER, "Expected a variable name to print");
     
     expect(TOKEN_PERIOD, "Expected '.' at the end of the sentence");
+    
+    return node;
+}
+
+// Rule: "If [identifier] is greater than [number] then [action]"
+std::unique_ptr<ASTNode> Parser::parseIfStatement() {
+    auto node = std::make_unique<IfNode>();
+    
+    expect(TOKEN_IF, "Expected 'If'");
+    
+    node->conditionVar = currentToken().value;
+    expect(TOKEN_IDENTIFIER, "Expected a variable name");
+    
+    expect(TOKEN_IS, "Expected 'is'");
+    expect(TOKEN_GREATER, "Expected 'greater'");
+    expect(TOKEN_THAN, "Expected 'than'");
+    
+    node->conditionValue = std::stoi(currentToken().value);
+    expect(TOKEN_NUMBER, "Expected a number");
+    
+    expect(TOKEN_THEN, "Expected 'then'");
+    
+    // Recursively parse the action (e.g., "Print x.")
+    node->action = parseStatement(); 
+    
+    return node;
+}
+
+// Rule: "Repeat [number] times: [action]"
+std::unique_ptr<ASTNode> Parser::parseRepeatStatement() {
+    auto node = std::make_unique<RepeatNode>();
+    
+    expect(TOKEN_REPEAT, "Expected 'Repeat'");
+    
+    node->count = std::stoi(currentToken().value);
+    expect(TOKEN_NUMBER, "Expected a number");
+    
+    expect(TOKEN_TIMES, "Expected 'times'");
+    expect(TOKEN_COLON, "Expected ':'");
+    
+    // Recursively parse the action inside the loop (e.g., "Print x.")
+    node->action = parseStatement();
     
     return node;
 }
