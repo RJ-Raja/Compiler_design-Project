@@ -6,13 +6,17 @@
 #include "semantic.h"
 #include "codegen.h"
 
-int main() {
+int main(int argc, char* argv[]) {
+    // Use command-line arguments for file paths if provided
+    std::string inputFilePath = (argc > 1) ? argv[1] : "IO/test_input.txt";
+    std::string outputFilePath = (argc > 2) ? argv[2] : "IO/output.cpp";
+
     std::cout << "\nStarting Team RS C++ Compiler...\n\n";
 
     // --- PHASE 1: READ INPUT ---
-    std::ifstream file("IO/test_input.txt");
+    std::ifstream file(inputFilePath);
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open test_input.txt" << std::endl;
+        std::cerr << "Error: Could not open " << inputFilePath << std::endl;
         return 1;
     }
     std::stringstream buffer;
@@ -56,14 +60,14 @@ int main() {
         std::cout << ">>> Running C++ Code Generator...\n";
         CodeGenerator generator;
         
-        // This will create a file named 'output.cpp' in your current folder
-        generator.generate(ast.get(), "IO/output.cpp"); 
+        generator.generate(ast.get(), outputFilePath); 
         
-        std::cout << "Code Generation: Success! 'output.cpp' has been created.\n\n";
+        std::cout << "Code Generation: Success! File has been created at: " << outputFilePath << "\n\n";
         std::cout << "=== COMPILATION PIPELINE FINISHED SUCCESSFULLY ===\n";
 
     } catch (const std::exception& e) {
         std::cerr << "\nCOMPILATION FAILED: " << e.what() << "\n"; 
+        return 1; // IMPORTANT: Return non-zero exit code so the server knows compilation failed
     }
 
     return 0;

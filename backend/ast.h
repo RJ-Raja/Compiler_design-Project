@@ -21,16 +21,22 @@ struct ASTNode {
 struct VarDeclNode : public ASTNode {
     std::string varName;
     std::string type; 
+    std::string initialValue;
+    bool hasInitialValue = false;
     void print(int indent = 0) const override {
         printIndent(indent);
-        std::cout << "[VarDeclNode] Create " << type << " -> " << varName << "\n";
+        if (hasInitialValue) {
+            std::cout << "[VarDeclNode] Create " << type << " -> " << varName << " = " << initialValue << "\n";
+        } else {
+            std::cout << "[VarDeclNode] Create " << type << " -> " << varName << "\n";
+        }
     }
 };
 
 // Node for "Set x to 10."
 struct AssignmentNode : public ASTNode {
     std::string varName;
-    int value;
+    std::string value;
     void print(int indent = 0) const override {
         printIndent(indent);
         std::cout << "[AssignmentNode] Set " << varName << " = " << value << "\n";

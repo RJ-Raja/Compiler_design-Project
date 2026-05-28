@@ -141,6 +141,7 @@
         </header>
 
         <div class="input-controls">
+            <span id="in" style="color: #666; font-size: 1rem; display: flex; align-items: center;">Input: </span>
             <label>
                 <input type="radio" name="inputType" value="text" checked> Type Code
             </label>
@@ -160,7 +161,7 @@
         </div>
 
         <div class="input-area">
-            <textarea id="textInput" placeholder="Enter your natural language commands here...&#10;e.g., Create integer x.&#10;Set x to 10."></textarea>
+            <textarea id="textInput" placeholder="Enter your natural language commands here...&#10;e.g., create integer x&#10;SET x to 10&#10;print x"></textarea>
             <div class="file-upload" id="fileInputContainer">
                 <input type="file" id="fileInput" accept=".txt">
                 <p>Select a .txt file containing your natural language code.</p>
@@ -238,11 +239,9 @@
             // Fetch request to the backend
             try {
                 const outputMode = radioOutputFile.checked ? 'file' : 'code';
-                const response = await fetch('http://localhost:3000/api/compile', {
+                const response = await fetch('/api/compile', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ code: sourceCode, outputMode: outputMode })
                 });
 
@@ -273,7 +272,7 @@
                 }
             } catch (error) {
                 terminalOutput.style.color = "#ff5555";
-                terminalOutput.textContent = "> Network Error: Could not connect to the compiler backend at http://localhost:3000.\n> Please ensure your backend server is running.";
+                terminalOutput.textContent = "> Network Error: Could not connect to the compiler backend.\n> Please ensure your Node server is running.";
                 setTimeout(() => terminalOutput.style.color = "var(--terminal-text)", 3000);
             }
         });

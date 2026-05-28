@@ -1,15 +1,12 @@
-dfmdslfm
-dsf
-sdf
-csdc
-cc=c=d
-Create integer score.
-Create integer lives.
-Set score to 0.
-Set lives to 3.
-Print score.
-Print lives.
+create score with value 100
+CREATE pi WITH value 3.14
+Create initial with value 'R'
+create greeting WITH value "Hello World"
+create isReady with VALUE TRUE
+CrEaTe message WITH value No periods needed anymore
 
-Create integer damage.
-Set damage to 10.
-Repeat 5 times: Print damage.
+print score
+PRINT pi
+print greeting
+print isReady
+Print message
