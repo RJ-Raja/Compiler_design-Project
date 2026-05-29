@@ -1,0 +1,50 @@
+Natural Language Compiler - Valid Input Examples
+You can copy/paste any of these into the compiler!
+
+--- 1. Variable Declarations (Strict Typed) ---
+Create integer score.
+create float pi
+CREATE char initial.
+create bool isReady
+
+--- 2. Variable Declarations (Dynamic "With Value" Syntax) ---
+Create health with value 100.
+create multiplier with value 1.5
+CREATE letter WITH VALUE 'A'
+create greeting with value "Hello World"
+Create active with value true
+create rawString with value This string has no quotes but works.
+
+--- 3. Assignments ---
+Set score to 50.
+set pi to 3.14159
+SET initial TO 'B'
+set greeting to "Welcome"
+Set active to false
+set rawString to Another unquoted string
+
+--- 4. Print Statements ---
+Print score.
+print pi
+PRINT greeting
+
+--- 5. If Statements (Conditionals) ---
+If score is greater than 10 then Print score.
+if health is greater than 0 then set active to true
+IF multiplier IS GREATER THAN 1 THEN print multiplier
+
+--- 6. Repeat Statements (Loops) ---
+Repeat 3 times: Print greeting.
+repeat 5 times : set score to 100
+
+--- 7. Extreme Mixed Case & Missing Punctuation Example ---
+cReAtE mixedCaseVar WiTh VaLuE 42
+sEt mixedCaseVar tO 99
+If mixedCaseVar is greater than 50 THEN pRiNt mixedCaseVar
+repeat 4 times: print mixedCaseVar
+
+--- 8. Current Compiler Limitations & Details ---
+• Volume of C++ Code: The compiler generates a single, linear main() function. It is great for linear scripts, but does not yet support creating external functions, structs, or classes.
+• Multiple Lines in Conditions/Loops: NO. The "If" and "Repeat" commands currently only accept exactly ONE action statement (e.g., "Repeat 5 times: Print x"). You cannot currently place 2 or more lines inside a condition or loop block.
+• Nested Loops/Conditions: You can syntactically chain single statements (e.g., "Repeat 5 times: If x is greater than 0 then Print x"). However, deeply nested loops may behave incorrectly in C++ right now because the Code Generator reuses the exact same loop variable ("i_loop") for every loop, causing scope shadowing.
+• Loop Support: Basic loops work perfectly for single-line actions using the "Repeat [number] times: [action]" syntax, translating directly into a C++ for-loop.
