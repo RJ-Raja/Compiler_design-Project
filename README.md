@@ -6,5 +6,7 @@
   <ol>
     <li>Rajat Negi</li>
     <li>Shivang</li>
+    <li>Rishav Singh Negi</li>
+    <li>Suyash Uniyal</li>
   </ol>
 </p>
