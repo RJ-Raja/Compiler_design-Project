@@ -1,0 +1,46 @@
+=========================================================
+NATURAL LANGUAGE TO C++ COMPILER - COMPLETE WORKFLOW
+=========================================================
+
+This document provides a detailed, step-by-step breakdown of exactly what happens when a user clicks the "Generate Code" button.
+
+--- [ STAGE 1: FRONTEND INITIATION ] ---
+1. User Input: The user writes Natural Language code in the browser textarea (e.g., "Create x with value 10") or uploads a .txt file.
+2. Interaction: The user selects their preferred output format (Only Code vs. Get File) and clicks "Generate Code".
+3. Fetch Request: The frontend JavaScript (index.html) packages the text and output preference into a JSON object and sends a POST request to `http://localhost:3000/api/compile`.
+
+--- [ STAGE 2: NODE.JS SERVER PREPARATION ] ---
+4. Receive Request: The Express server (server.js) receives the JSON payload containing the user's natural language code.
+5. Setup Temp Files: To support multiple users simultaneously without race conditions, the server generates a unique timestamp ID. It creates two temporary paths:
+   - temp_input_<ID>.txt (to hold the english text)
+   - temp_output_<ID>.cpp (where the C++ compiler should write the code)
+6. Write Input: The server saves the user's string into the temp_input file.
+
+--- [ STAGE 3: C++ COMPILER EXECUTION (The Core) ] ---
+7. Subprocess Spawn: Node.js uses `child_process.exec` to run the C++ executable:
+   `main.exe temp_input_<ID>.txt temp_output_<ID>.cpp`
+8. Main Initialization: `main.cpp` starts, reading the input file paths from the command-line arguments.
+9. Lexical Analysis (Lexer): 
+   - Lexer reads the text character by character.
+   - It groups characters into logical Tokens (e.g., "Create" -> TOKEN_CREATE, "10" -> TOKEN_NUMBER).
+10. Syntax Analysis (Parser):
+   - Parser loops through the Tokens.
+   - It ignores case sensitivity and optional periods.
+   - It builds an Abstract Syntax Tree (AST). For example, it creates a `VarDeclNode` containing the type (int), name (x), and value (10).
+11. Semantic Analysis:
+   - SemanticAnalyzer walks the AST.
+   - It registers variables in a Symbol Table to ensure logic is sound (e.g., preventing the user from saying "Print y" if 'y' doesn't exist).
+12. Code Generation:
+   - CodeGenerator walks the validated AST.
+   - It translates the `VarDeclNode` directly into a C++ string: `int x = 10;\n`.
+   - It writes the final C++ boilerplate and translated strings into the temp_output file.
+13. Exit: The C++ program finishes and returns a success code (0) to Node.js.
+
+--- [ STAGE 4: SERVER CLEANUP & RESPONSE ] ---
+14. Read Output: Node.js detects that `main.exe` finished successfully. It reads the contents of the temp_output file.
+15. Cleanup: Node.js deletes both the temporary `.txt` input file and `.cpp` output file to keep the server clean.
+16. Respond: The server sends a JSON response back to the frontend containing the generated C++ code and the terminal logs.
+
+--- [ STAGE 5: FRONTEND RENDERING ] ---
+17. Display UI: The frontend receives the JSON response and prints the C++ code into the dark hacker-style terminal box.
+18. Auto-Download (Optional): If the user selected "Get File (.cpp)", the JavaScript dynamically creates a `Blob` containing the C++ code, builds a hidden `<a>` link, and simulates a click to force the user's browser to download `output.cpp`.

@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
     } catch (const std::exception& e) {
         std::cerr << "\nCOMPILATION FAILED: " << e.what() << "\n"; 
-        return 1; // IMPORTANT: Return non-zero exit code so the server knows compilation failed
+        return 1; // Returning non-zero exit code so the server knows compilation failed
     }
 
     return 0;

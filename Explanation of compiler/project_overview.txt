@@ -1,0 +1,56 @@
+=========================================================
+NATURAL LANGUAGE TO C++ COMPILER - PROJECT OVERVIEW
+=========================================================
+
+1. HOW THE WHOLE PROJECT WORKS (THE PIPELINE)
+---------------------------------------------------------
+This project is a complete, full-stack application that translates English-like sentences into functioning C++ code. Here is the step-by-step pipeline of how a user's input travels through the system:
+
+1. Frontend (UI): The user types Natural Language code (e.g., "Create score with value 100") into the website (index.html) or uploads a text file.
+2. HTTP Request: The browser sends a POST request containing this text to the Node.js server (server.js).
+3. Server Processing: The Node.js server creates temporary files to hold the user's input and reserves a name for the output file.
+4. Execution: The Node server executes the compiled C++ binary (backend/main.exe), passing the temporary file paths as arguments.
+5. Compilation (Inside C++): 
+   - Lexer reads the text and turns it into Tokens (words/symbols).
+   - Parser reads the Tokens, ensures the grammar is correct, and builds an Abstract Syntax Tree (AST).
+   - Semantic Analyzer checks for logical errors (like using a variable before creating it).
+   - Code Generator walks the AST and writes actual C++ code (e.g., "int score = 100;") to the output file.
+6. Server Response: The Node server reads the generated C++ file, sends it back to the frontend, and cleans up the temporary files.
+7. Result: The frontend displays the C++ code in the terminal and optionally downloads the file to the user's computer.
+
+
+2. WHAT EACH FILE IS DOING
+---------------------------------------------------------
+
+[ SERVER & FRONTEND ]
+* server.js: 
+  The Express.js web server. It acts as the middleman between the web browser and the C++ compiler. It serves the frontend, receives API requests, safely executes the C++ backend using temporary files to prevent data overlaps, and returns the result.
+
+* index.html (and frontend/index.html): 
+  The user interface. It contains the HTML layout, CSS styling for the light-blue theme and hacker terminal, and the JavaScript logic to handle UI toggles and communicate with server.js.
+
+[ COMPILER BACKEND (C++) ]
+* backend/main.cpp: 
+  The entry point of the C++ compiler. It orchestrates the entire compilation pipeline by calling the Lexer, Parser, Semantic Analyzer, and Code Generator in the correct order.
+
+* backend/lexer.h & lexer.cpp: 
+  (The Lexical Analyzer). It reads the raw string of English text character by character and groups them into "Tokens" (e.g., TOKEN_CREATE, TOKEN_IDENTIFIER).
+
+* backend/parser.h & parser.cpp: 
+  (The Syntax Analyzer). It reads the stream of Tokens and ensures they form valid sentences according to the project's rules. It groups these rules into an Abstract Syntax Tree (AST) structure, while cleverly ignoring case sensitivity and optional punctuation.
+
+* backend/ast.h: 
+  Defines the structure of the Abstract Syntax Tree. It contains nodes like `VarDeclNode` (for creating variables) and `IfNode` (for conditionals). It also contains the logic to print a visual representation of the tree to the console.
+
+* backend/semantic.h & semantic.cpp: 
+  (The Semantic Analyzer). It traverses the AST to check for logical errors, utilizing a Symbol Table to track variables. It ensures you don't assign a value to a variable that doesn't exist.
+
+* backend/codegen.h & codegen.cpp: 
+  (The Code Generator). It traverses the final, validated AST and writes equivalent, formatted C++ code into a `.cpp` file.
+
+[ INPUT EXAMPLES ]
+* possibleInput.txt / other_text_input/possibleInput.txt: 
+  Text files containing examples of valid Natural Language scripts that the parser can successfully understand and compile.
+
+* backend/IO/test_input.txt: 
+  A default testing file used directly by `main.cpp` when the compiler is run manually from the command line without arguments.

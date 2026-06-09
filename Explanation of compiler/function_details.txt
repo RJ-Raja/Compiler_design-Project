@@ -1,0 +1,81 @@
+=========================================================
+NATURAL LANGUAGE TO C++ COMPILER - FUNCTION DETAILS
+=========================================================
+This document breaks down the specific responsibilities of the functions within the key files of the project.
+
+---------------------------------------------------------
+FILE: index.html (JavaScript Section)
+---------------------------------------------------------
+* toggleInputMode() 
+  - How it works: Checks which radio button is active and toggles the CSS `display` property of the text area and file upload container.
+
+* readFileContent(file)
+  - How it works: Wraps the native `FileReader` API in a JavaScript Promise, allowing the file to be read asynchronously. Returns the text contents of an uploaded `.txt` file.
+
+* generateBtn.addEventListener('click') (Anonymous Async Function)
+  - How it works: Gathers input (either from the text box or by awaiting `readFileContent`), updates the UI to show a loading state, and sends an HTTP POST `fetch` request to the backend. Upon receiving a response, it updates the terminal UI, and if the user selected the "Get File" option, it generates a Blob object and creates a temporary <a> tag to trigger a browser download.
+
+
+---------------------------------------------------------
+FILE: server.js
+---------------------------------------------------------
+* app.post('/api/compile', ...)
+  - How it works: The main API route handler. It generates unique timestamps (Date.now()) to create collision-free temporary file paths. It uses Node's `fs.writeFileSync` to write the code, Node's `child_process.exec` to run the C++ `main.exe` binary, and `fs.readFileSync` to read the generated output back to the user. It also cleans up the temporary files using `fs.unlinkSync`.
+
+
+---------------------------------------------------------
+FILE: backend/main.cpp
+---------------------------------------------------------
+* main(int argc, char* argv[])
+  - How it works: The starting point of the C++ binary. It checks `argc` to see if file paths were passed by the Node server. If so, it uses them; otherwise, it defaults to local testing files. It then reads the file into a string buffer and sequentially passes the data through the Lexer, Parser, SemanticAnalyzer, and CodeGenerator objects. Catch blocks capture any thrown syntax/semantic errors.
+
+
+---------------------------------------------------------
+FILE: backend/parser.cpp
+---------------------------------------------------------
+* toLower(const std::string& str) [Static Helper]
+  - How it works: Uses `std::transform` and `std::tolower` to convert any string to completely lowercase, allowing for case-insensitive keyword checking.
+
+* isStatementStart(const std::string& val, TokenType type) [Static Helper]
+  - How it works: Checks if a given token represents the start of a new command (like 'create', 'set', 'print'). Used to allow optional periods by stopping the current parsing rule when the next command begins.
+
+* currentToken(), advance(), expect()
+  - How they work: Utility functions to navigate the Token array. `expect` asserts that the current token matches a specific grammar rule, throwing a detailed syntax error if the user typed something invalid.
+
+* parseProgram()
+  - How it works: The entry point for parsing. It loops through the token stream until it hits the End of File (EOF), safely skipping rogue periods, and pushing parsed statements into the root `ProgramNode`.
+
+* parseStatement()
+  - How it works: Looks at the first word of the current sentence (e.g., "create") and routes the compiler to the correct specific parsing function.
+
+* parseVariableDeclaration()
+  - How it works: Parses phrases starting with "Create". It checks if the user is using the new syntax ("Create x with value Y") or old strict syntax ("Create integer x"). If using the new syntax, it analyzes the value (checking for quotes, decimals, or 'true/false') to auto-infer if the C++ type should be a string, float, bool, int, or char.
+
+* parseAssignment()
+  - How it works: Parses phrases starting with "Set". It extracts the variable name and the value it is being set to, doing similar inference to wrap non-numerical values in string quotes for valid C++ output.
+
+* parsePrint(), parseIfStatement(), parseRepeatStatement()
+  - How they work: These handle specific command structures. `parseIfStatement` and `parseRepeatStatement` are notable because they recursively call `parseStatement()` to capture the action that belongs *inside* the condition or loop.
+
+
+---------------------------------------------------------
+FILE: backend/codegen.cpp
+---------------------------------------------------------
+* writeIndent()
+  - How it works: A formatting helper that outputs 4 spaces to the output file multiplied by the `currentIndent` level, ensuring the C++ code is properly indented inside main() and loops.
+
+* generate(const ProgramNode* program, const std::string& outputFilename)
+  - How it works: Opens the `ofstream` for writing. It writes the standard C++ includes and `int main() {` boilerplate. It loops over the AST statements, calling `generateNode`, and finally closes the `main()` function.
+
+* generateNode(const ASTNode* node)
+  - How it works: Uses C++ RTTI (`dynamic_cast`) to determine exactly which type of AST node it is looking at. 
+    - If it's a `VarDeclNode`, it outputs `type name = value;`.
+    - If it's a `PrintNode`, it outputs `std::cout << name;`.
+    - If it's a `RepeatNode`, it outputs a standard C++ `for(int i_loop = 0...)` block, temporarily increasing the indentation level for the code inside the loop.
+
+
+---------------------------------------------------------
+FILE: backend/ast.h
+---------------------------------------------------------
+* ASTNode::print(int indent) (Virtual Function Overrides)
+  - How it works: Each node struct (VarDeclNode, IfNode, etc.) overrides this method. It is used to print a visual, indented representation of the Abstract Syntax Tree to the Node.js console during the compilation phase, making it easier to debug how the parser interpreted the English sentences.
